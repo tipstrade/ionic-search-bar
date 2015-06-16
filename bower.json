@@ -1,0 +1,33 @@
+{
+  "author": "TipsTrade Ltd.",
+  "name": "ionic-search-bar",
+  "version": "0.1",
+  "homepage": "https://github.com/tipstrade/ionic-search-bar",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tipstrade/ionic-search-bar.git"
+  },
+  "main": [
+    "./src/ionic-search-bar.js",
+    "./src/ionic-search-bar.css"
+  ],
+  "dependencies": {
+    "angular": "^1/2"
+  },
+  "authors": [
+    "TipsTrade Ltd."
+  ],
+  "description": "A Search Bar for Ionic Framework",
+  "keywords": [
+    "Ionic",
+    "multiselect"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
