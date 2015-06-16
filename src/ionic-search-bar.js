@@ -4,56 +4,69 @@
 (function () { // To stop JSHint/JSLint whing
 "use strict";
 
-.directive('searchBar', [function () {
+angular.module("ionic-search-bar", ["ionic"])
+
+.directive('searchBar', [function ($ionicNavBarDelegate) {
   return {
     scope: {
-      ngModel: '='
+      ngModel: '=',
+      autoReset: "=",
+      onSearchCallback: '&onSearch'
     },
-    require: ['^ionNavBar', '?ngModel'],
+    require: ['?ngModel'],
     restrict: 'E',
     replace: true,
-    template: '<ion-nav-buttons side="right">'+
-            '<div class="searchBar">'+
+    template: '<div class="searchBar">'+
               '<div class="searchTxt" ng-show="ngModel.show">'+
                   '<div class="bgdiv"></div>'+
                   '<div class="bgtxt">'+
-                    '<input type="text" placeholder="Procurar..." ng-model="ngModel.txt">'+
+                    '<input type="text" placeholder="Search..." ng-model="ngModel.text" ng-keypress="searchKeyPress($event)">'+
                   '</div>'+
                 '</div>'+
-                '<i class="icon placeholder-icon" ng-click="ngModel.txt=\'\';ngModel.show=!ngModel.show"></i>'+
-            '</div>'+
-          '</ion-nav-buttons>',
-    
+                '<button class="button button-clear icon ion-search" ng-click="searchClick($event)"></button>'+
+            '</div>',
+
     compile: function (element, attrs) {
-      var icon=attrs.icon
+      var icon = attrs.icon
           || (ionic.Platform.isAndroid() && 'ion-android-search')
-          || (ionic.Platform.isIOS()     && 'ion-ios7-search')
+          || (ionic.Platform.isIOS()     && 'ion-ios-search')
           || 'ion-search';
       angular.element(element[0].querySelector('.icon')).addClass(icon);
       
+      var placeholder = attrs.placeholder || 'Search...';
+      angular.element(element[0].querySelector('input')).attr('placeholder', placeholder);
+      
       return function($scope, $element, $attrs, ctrls) {
-        var navBarCtrl = ctrls[0];
-        $scope.navElement = $attrs.side === 'right' ? navBarCtrl.rightButtonsElement : navBarCtrl.leftButtonsElement;
-        
       };
     },
-    controller: ['$scope','$ionicNavBarDelegate', function($scope,$ionicNavBarDelegate){
-      var title, definedClass;
-      $scope.$watch('ngModel.show', function(showing, oldVal, scope) {
-        if(showing!==oldVal) {
+    
+    controller: ['$scope','$ionicNavBarDelegate', function($scope, $ionicNavBarDelegate){
+      var title;
+      
+      $scope.searchClick = function(e) {
+        if ($scope.ngModel.show) {
+          $scope.onSearchCallback();
+        } else if ($scope.autoReset) {
+          $scope.ngModel.text = "";
+        }
+        $scope.ngModel.show = !$scope.ngModel.show;
+      };
+      
+      $scope.searchKeyPress = function(e) {
+        if (e.keyCode === 13)
+          $scope.searchClick(e);
+      };
+      
+      $scope.$watch('ngModel.show', function(showing, oldVal, $scope) {
+        if(showing !== oldVal) {
           if(showing) {
-            if(!definedClass) {
-              var numicons=$scope.navElement.children().length;
-              angular.element($scope.navElement[0].querySelector('.searchBar')).addClass('numicons'+numicons);
-            }
-            
-            title = $ionicNavBarDelegate.getTitle();
-            $ionicNavBarDelegate.setTitle('');
+            title = $ionicNavBarDelegate.title();
+            $ionicNavBarDelegate.title('');
           } else {
-            $ionicNavBarDelegate.setTitle(title);
+            $ionicNavBarDelegate.title(title);
           }
         } else if (!title) {
-          title = $ionicNavBarDelegate.getTitle();
+          title = $ionicNavBarDelegate.title();
         }
       });
     }]
