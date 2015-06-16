@@ -17,6 +17,8 @@ This is the implimentation of the concept described in
 <script src="lib/ionic-search-bar/src/ionic-search-bar.js" type="text/javascript"></script>
 <link href="lib/ionic-search-bar/src/ionic-search-bar.css" rel="stylesheet">
 
-<search-bar ng-model="search"></search-bar>
+<ion-nav-buttons side="right">
+  <search-bar ng-model="search"></search-bar>
+</ion-nav-buttons side="right">
 ```
 
