@@ -41,3 +41,7 @@
   padding-right:5px;
   width: 100%;
 }
+.searchBar .item-input-wrapper {
+  background: inherit !important;
+}
+

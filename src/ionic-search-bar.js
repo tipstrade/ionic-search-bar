@@ -6,7 +6,7 @@
 
 angular.module("ionic-search-bar", ["ionic"])
 
-.directive('searchBar', [function ($ionicNavBarDelegate) {
+.directive('searchBar', [function () {
   return {
     scope: {
       ngModel: '=',
@@ -16,15 +16,17 @@ angular.module("ionic-search-bar", ["ionic"])
     require: ['?ngModel'],
     restrict: 'E',
     replace: true,
-    template: '<div class="searchBar">'+
-              '<div class="searchTxt" ng-show="ngModel.show">'+
-                  '<div class="bgdiv"></div>'+
-                  '<div class="bgtxt">'+
-                    '<input type="text" placeholder="Search..." ng-model="ngModel.text" ng-keypress="searchKeyPress($event)">'+
-                  '</div>'+
-                '</div>'+
-                '<button class="button button-clear icon ion-search" ng-click="searchClick($event)"></button>'+
-            '</div>',
+    template: '<div class="searchBar">' +
+                '<div class="searchTxt" ng-show="ngModel.show">' +
+                  '<div class="bgdiv"></div>' +
+                    '<div class="bgtxt item-input-wrapper">' +
+                      '<i class="icon placeholder-icon ion-search"></i>' +
+                      '<input type="text" placeholder="Search..." ng-model="ngModel.text" ng-keypress="searchKeyPress($event)">' +
+                    '</div>' +
+                  '</div>' +
+                  '<button class="button button-clear icon" ng-class="{\'ion-close-round\': ngModel.show, \'ion-search\': !ngModel.show}" ng-click="searchClick($event)"></button>' +
+                '</div>' +
+              '</div>',
 
     compile: function (element, attrs) {
       var icon = attrs.icon
@@ -37,24 +39,32 @@ angular.module("ionic-search-bar", ["ionic"])
       angular.element(element[0].querySelector('input')).attr('placeholder', placeholder);
       
       return function($scope, $element, $attrs, ctrls) {
+        $scope.rootElement = $element;
       };
     },
     
-    controller: ['$scope','$ionicNavBarDelegate', function($scope, $ionicNavBarDelegate){
+    controller: ['$scope','$ionicNavBarDelegate', "$timeout", function($scope, $ionicNavBarDelegate, $timeout){
       var title;
       
       $scope.searchClick = function(e) {
         if ($scope.ngModel.show) {
-          $scope.onSearchCallback();
-        } else if ($scope.autoReset) {
           $scope.ngModel.text = "";
+          $scope.onSearchCallback();
+          
+        } else {
+          if ($scope.autoReset)
+            $scope.ngModel.text = "";
+          
+          $timeout(function() {
+            angular.element($scope.rootElement[0].querySelector('input'))[0].focus();
+          });
         }
         $scope.ngModel.show = !$scope.ngModel.show;
       };
       
       $scope.searchKeyPress = function(e) {
         if (e.keyCode === 13)
-          $scope.searchClick(e);
+          $scope.onSearchCallback();
       };
       
       $scope.$watch('ngModel.show', function(showing, oldVal, $scope) {
